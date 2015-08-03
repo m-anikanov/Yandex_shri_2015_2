@@ -46,6 +46,56 @@ function getData(url, callback) {
  */
 var requests = ['/countries', '/cities', '/populations'];
 var responses = {};
+
+var countPopulaton = function(query){
+     var c = [], cc = [], p = 0;
+                for (i = 0; i < responses['/countries'].length; i++) {
+                    if (responses['/countries'][i].continent === query) {
+                        c.push(responses['/countries'][i].name);
+                    }
+                }
+
+                for (i = 0; i < responses['/countries'].length; i++) {
+                    if (responses['/countries'][i].name === query) {
+                        c.push(responses['/countries'][i].name);
+                    }
+                }                   
+                
+                c.length === 0 ? c.push(query) : false;
+     
+                for (i = 0; i < responses['/cities'].length; i++) {
+                    for (j = 0; j < c.length; j++) {
+                        if (responses['/cities'][i].country === c[j] ) {
+                            cc.push(responses['/cities'][i].name);
+                        }
+                    }
+                }
+
+                cc.length === 0 ? cc.push(query) : false;
+     
+                for (i = 0; i < responses['/populations'].length; i++) {
+                    for (j = 0; j < cc.length; j++) {
+                        if (responses['/populations'][i].name === cc[j]) {
+                            p += responses['/populations'][i].count;
+                        }
+                    }
+                }
+
+                if(p==0){
+                    console.log('Sorry, no such data');
+
+                }else{
+                    console.log('Total population in '+query+': ' + p);
+
+                }
+}
+
+var startDialog = function(){
+    var result = window.prompt('Введите название страны или города', 'Oceania');
+    countPopulaton(result);
+    var continueDialog = window.prompt('Повторить запрос? (Y/N)', 'N');
+    continueDialog === 'Y' ? startDialog() : false;
+}
  
 for (i = 0; i < 3; i++) {
 
@@ -59,34 +109,16 @@ for (i = 0; i < 3; i++) {
                 l.push(K);
      
             if (l.length == 3) {
-                var c = [], cc = [], p = 0;
-                for (i = 0; i < responses['/countries'].length; i++) {
-                    if (responses['/countries'][i].continent === 'Africa') {
-                        c.push(responses['/countries'][i].name);
-                    }
-                }
-     
-                for (i = 0; i < responses['/cities'].length; i++) {
-                    for (j = 0; j < c.length; j++) {
-                        if (responses['/cities'][i].country === c[j]) {
-                            cc.push(responses['/cities'][i].name);
-                        }
-                    }
-                }
-     
-                for (i = 0; i < responses['/populations'].length; i++) {
-                    for (j = 0; j < cc.length; j++) {
-                        if (responses['/populations'][i].name === cc[j]) {
-                            p += responses['/populations'][i].count;
-                        }
-                    }
-                }
-     
-                console.log('Total population in African cities: ' + p);
+               countPopulaton('Africa');
+               startDialog();
             }
         };
      
         getData(request, callback);
 
     })(i);
+    
 }
+
+
+//295634
